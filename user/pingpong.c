@@ -10,7 +10,6 @@ int main(int argc, char *argv[]) {
 	 * 		p[0] always represents the reading end
 	 * 		p[1] always represents the writing end
 	 */
-	
 	int p_parent[2];
 	int p_child[2];
 
@@ -47,7 +46,6 @@ int main(int argc, char *argv[]) {
 		close(p_child[0]);
 
 		printf("%d: received %s\n", pid, buf);
-		
 	}
 	
 	exit(0);
