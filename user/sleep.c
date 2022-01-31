@@ -1,5 +1,4 @@
 #include "kernel/types.h"
-#include "kernel/stat.h"
 #include "user/user.h"
 
 int main(int argc, char *argv[]) {
@@ -7,6 +6,7 @@ int main(int argc, char *argv[]) {
 		printf("Usage: sleep <time>\n");
 		exit(-1);
 	}
+	
 	int period = atoi(argv[1]);
 	if(period <= 0) {
 		printf("Invalid period, has to be bigger than 0\n");
