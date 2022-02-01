@@ -3,8 +3,7 @@
 #include "user/user.h"
 #include "kernel/fs.h"
 
-char* fmtname(char *path) {
-	static char buf[DIRSIZ+1];
+char* fmtname_no_padding(char *path) {
 	char *p;
 
 	// Find first character after last slash.
@@ -12,12 +11,8 @@ char* fmtname(char *path) {
 	;
 	p++;
 
-	// Return blank-padded name.
-	if(strlen(p) >= DIRSIZ)
+	// Return no-padding name.
 	return p;
-	memmove(buf, p, strlen(p));
-	memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
-	return buf;
 }
 
 void find(char *path, char *target_fn) {
@@ -35,14 +30,16 @@ void find(char *path, char *target_fn) {
 		close(fd);
 		return;
 	}
-	printf("st.type = %d\n", st.type);
-	printf("T_DIR = %d\n", T_DIR);
+	// printf("st.type = %d\n", st.type);
+	// printf("T_DIR = %d\n", T_DIR);
 	switch(st.type){
 		// 类型为文件：检查文件名是否匹配
 		
 		case T_FILE:
 			// 目标文件名匹配
-			if(strcmp(fmtname(path), target_fn) == 0)
+			// printf("file: %s\t", fmtname_no_padding(path));
+			// printf("compare: %d\n", strcmp(fmtname_no_padding(path), target_fn));
+			if(strcmp(fmtname_no_padding(path), target_fn) == 0)
 				printf("%s\n", path);
 			break;
 
@@ -54,12 +51,13 @@ void find(char *path, char *target_fn) {
 					continue;
 				// 组装该子目录下所有文件及文件夹的全局路径
 				char *new_path = malloc(strlen(path) + 1 + strlen(de.name));
-				printf("new len: %d\n", strlen(path) + 1 + strlen(de.name));
-				printf("de.name: %s\n", de.name);
-				strcpy(new_path, "/");
-				strcpy(new_path, de.name);
-				printf("%s\n", new_path);
-				exit(-2);
+				// printf("new len: %d\n", strlen(path) + 1 + strlen(de.name));
+				// printf("de.name: %s\n", de.name);
+				strcpy(new_path, path);
+				strcpy(new_path + strlen(path), "/");
+				strcpy(new_path + strlen(path) + 1, de.name);
+				// printf("%s\n", new_path);
+				// exit(-2);
 				// recursion
 				find(new_path, target_fn);
 			}
@@ -74,9 +72,9 @@ int main(int argc, char *argv[]) {
 		printf("Usage: find <dir> <fn>");
 		exit(-1);
 	}
-	printf("argv 0: %s\n", argv[0]);
-	printf("argv 1: %s\n", argv[1]);
-	printf("argv 2: %s\n", argv[2]);
+	// printf("argv 0: %s\n", argv[0]);
+	// printf("argv 1: %s\n", argv[1]);
+	// printf("argv 2: %s\n", argv[2]);
 	// int i;
 	// for(i = 2; i < argc; i++) 
 	find(argv[1], argv[2]);
