@@ -4,8 +4,12 @@
 * @Website: www.wangzihao.org
 * @Date:    2022-01-31 13:53:02
 * @Last Modified by:   zihaowang
-* @Last Modified time: 2022-02-02 08:36:42
+* @Last Modified time: 2022-02-03 11:11:45
+* @Description:
+* 	MIT 6.828: Lab util - task pingpong
+*	https://pdos.csail.mit.edu/6.828/2021/labs/util.html
 */
+
 #include "kernel/types.h"
 #include "kernel/stat.h"
 #include "user/user.h"

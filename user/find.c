@@ -4,8 +4,13 @@
 * @Website: www.wangzihao.org
 * @Date:    2022-01-31 09:21:40
 * @Last Modified by:   zihaowang
-* @Last Modified time: 2022-02-02 08:35:48
+* @Last Modified time: 2022-02-03 11:11:49
+* @Description:
+* 	MIT 6.828: Lab util - task find, https://pdos.csail.mit.edu/6.828/2021/labs/util.html
+* 	
+*	Programed to (recursively) find specific files under given directory.
 */
+
 #include "kernel/types.h"
 #include "kernel/stat.h"
 #include "user/user.h"

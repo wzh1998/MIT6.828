@@ -4,7 +4,11 @@
 * @Website: www.wangzihao.org
 * @Date:    2022-01-29 11:45:34
 * @Last Modified by:   zihaowang
-* @Last Modified time: 2022-02-02 08:36:10
+* @Last Modified time: 2022-02-03 11:11:03
+* @Description:
+* 	MIT 6.828: Lab util - task sleep, https://pdos.csail.mit.edu/6.828/2021/labs/util.html
+* 	
+*	Programed to achieve the user call 'sleep' in UNIX system.
 */
 
 #include "kernel/types.h"
