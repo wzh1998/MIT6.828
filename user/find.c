@@ -4,7 +4,7 @@
 * @Website: www.wangzihao.org
 * @Date:    2022-01-31 09:21:40
 * @Last Modified by:   zihaowang
-* @Last Modified time: 2022-02-03 11:11:49
+* @Last Modified time: 2022-02-04 10:00:30
 * @Description:
 * 	MIT 6.828: Lab util - task find, https://pdos.csail.mit.edu/6.828/2021/labs/util.html
 * 	
@@ -66,6 +66,8 @@ void find(char *path, char *target_fn) {
 
 				// 递归
 				find(new_path, target_fn);
+				// 释放空间
+				free(new_path);
 			}
 			break;
 	}
