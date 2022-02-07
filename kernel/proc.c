@@ -657,3 +657,19 @@ procdump(void)
     printf("\n");
   }
 }
+
+// Task sysinfo: get the number of processes whose state is not UNUSED
+// https://pdos.csail.mit.edu/6.828/2021/labs/syscall.html
+uint64
+get_processes_num(void) 
+{
+  struct proc *p;
+  uint64 count = 0;
+
+  for(p = proc; p < &proc[NPROC]; p++) {
+    if(p->state != UNUSED) 
+      count++;
+  }
+
+  return count;
+}
