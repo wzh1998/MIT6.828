@@ -14,6 +14,9 @@ void freerange(void *pa_start, void *pa_end);
 extern char end[]; // first address after kernel.
                    // defined by kernel.ld.
 
+uint64 allocated_pages; // record how many pages are allocated
+
+
 struct run {
   struct run *next;
 };
@@ -26,6 +29,7 @@ struct {
 void
 kinit()
 {
+  allocated_pages = 0;
   initlock(&kmem.lock, "kmem");
   freerange(end, (void*)PHYSTOP);
 }
@@ -60,6 +64,8 @@ kfree(void *pa)
   r->next = kmem.freelist;
   kmem.freelist = r;
   release(&kmem.lock);
+
+  allocated_pages = (allocated_pages > 0) ? allocated_pages - 1 : 0;
 }
 
 // Allocate one 4096-byte page of physical memory.
@@ -72,11 +78,28 @@ kalloc(void)
 
   acquire(&kmem.lock);
   r = kmem.freelist;
-  if(r)
+
+  if(r) {
     kmem.freelist = r->next;
+    allocated_pages++;
+  }
+  
   release(&kmem.lock);
 
   if(r)
     memset((char*)r, 5, PGSIZE); // fill with junk
   return (void*)r;
+}
+
+// Task sysinfo: get the bytes of free memory
+// https://pdos.csail.mit.edu/6.828/2021/labs/syscall.html
+uint64
+get_free_mem(void)
+{
+  // roundup to abandon incomplete pages (which are unable to be allocated)
+  uint64 total_bytes = PHYSTOP - PGROUNDUP((uint64)end);
+  // calculate used bytes from allocated pages
+  uint64 used_bytes = PGSIZE * allocated_pages;
+
+  return total_bytes - used_bytes;
 }

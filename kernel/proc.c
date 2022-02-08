@@ -289,6 +289,9 @@ fork(void)
   }
   np->sz = p->sz;
 
+  // Copy the mask of traced system calls.
+  np->trace_mask = p->trace_mask;
+
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
 
@@ -653,4 +656,20 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+// Task sysinfo: get the number of processes whose state is not UNUSED
+// https://pdos.csail.mit.edu/6.828/2021/labs/syscall.html
+uint64
+get_processes_num(void) 
+{
+  struct proc *p;
+  uint64 count = 0;
+
+  for(p = proc; p < &proc[NPROC]; p++) {
+    if(p->state != UNUSED) 
+      count++;
+  }
+
+  return count;
 }
