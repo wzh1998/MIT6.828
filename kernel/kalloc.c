@@ -16,6 +16,7 @@ extern char end[]; // first address after kernel.
 
 uint64 allocated_pages; // record how many pages are allocated
 
+
 struct run {
   struct run *next;
 };
@@ -77,10 +78,12 @@ kalloc(void)
 
   acquire(&kmem.lock);
   r = kmem.freelist;
+
   if(r) {
     kmem.freelist = r->next;
     allocated_pages++;
   }
+  
   release(&kmem.lock);
 
   if(r)
