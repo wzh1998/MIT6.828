@@ -6,6 +6,9 @@
 #include "defs.h"
 #include "fs.h"
 
+// xv6 page table has 3 level architecture, levels are numbered from 2 (top) to 0(bottom).
+#define TOPLVL 2
+
 /*
  * the kernel's page table.
  */
@@ -431,4 +434,40 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   } else {
     return -1;
   }
+}
+
+// A depth first search helper function used to recursively print the content of a 
+// given RISC-V page table, such that the architecture of the content can be visualised.
+void
+dfs(pagetable_t pagetable, int level)
+{
+  // stop the recursion when reaching the leaf node
+  if(level < 0) return;
+
+  // iterate through all 512(i.e., 2^9) PTEs in the current level's page table.
+  for(int i = 0; i < 512; i++){
+    pte_t pte = pagetable[i];
+    // find all valid entries and print their depth (indicated by string '..')
+    if(pte & PTE_V){
+      printf("..");
+      for(int j = level; j < TOPLVL; j++)
+        printf(" ..");
+      // get the next level's physical address (stored in var child)
+      uint64 child = PTE2PA(pte);
+      printf("%d: pte %p pa %p\n", i, (uint64)pte, child);
+      // recursively print the ptes' content
+      dfs((pagetable_t)child, level - 1);
+    }
+  }
+}
+
+// vmprint initiates and calls a depth first search helper function to 
+// recursively print the content of a given RISC-V page table, in order
+// to visualise the page table.
+void
+vmprint(pagetable_t pagetable)
+{
+  printf("page table %p\n", (uint64)pagetable);
+  dfs(pagetable, TOPLVL);
+  return;
 }
