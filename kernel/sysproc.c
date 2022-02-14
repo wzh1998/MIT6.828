@@ -75,16 +75,6 @@ sys_sleep(void)
   return 0;
 }
 
-
-#ifdef LAB_PGTBL
-int
-sys_pgaccess(void)
-{
-  // lab pgtbl: your code here.
-  return 0;
-}
-#endif
-
 uint64
 sys_kill(void)
 {
@@ -107,3 +97,52 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+#ifdef LAB_PGTBL
+// system call that reports which pages have been accessed
+uint64
+sys_pgaccess(void)
+{
+  // define user page's virtual addr (usr_va), and physical addr of access bits stored in user space (usr_pa)
+  uint64 usr_va, usr_pa;
+  int page_num;
+
+  // parse three input arguments
+  // 1st: the starting virtual addr of the 1st user page
+  // 2nd: the number of pages to check
+  // 3rd: the user addr to the buffer, which will store the the bitmask result
+  if(argaddr(0, &usr_va) < 0) return -1;
+  if(argint(1, &page_num) < 0) return -1;
+  if(argaddr(2, &usr_pa)) return -1;
+
+  // check if the number of pages is valid 
+  // since we are using uint64 to store the bits, the max page allowed to check is 64.
+  if(page_num > 64) return -1;
+
+  // store the mask in a temp buffer in the kernel, then copy it out to user space
+  pte_t* pte;
+  struct proc *p = myproc();
+  unsigned int ker_abits = 0;
+
+  // note: the page corresponds to usr_va will not be checked, checking starts at page with index 1.
+  for(int i = 1; i <= page_num; i++) {
+    pte = walk(p->pagetable, usr_va + i*PGSIZE, 0);
+    // set the corresponding bit in the temp buffer, first page corresponds to LSB
+    if((*pte & PTE_V) && (*pte & PTE_U)) {
+      if(*pte & PTE_A){
+        ker_abits |= 1 << i;
+        continue;
+      }
+      // clear access bit after accessed the PTE
+      *pte &= ~PTE_A;
+    }
+  }
+
+  // copy the access bits from kernel space to user space
+  if(copyout(p->pagetable, usr_pa, (char *)&ker_abits, sizeof(ker_abits)) < 0)
+    return -1;
+
+  return 0;
+}
+
+#endif
